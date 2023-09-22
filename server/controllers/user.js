@@ -1,0 +1,57 @@
+import { error } from '../middlewares/error.js'
+import { User } from '../models/User.js'
+import { Order } from '../models/Order.js'
+export const myProfile = (req, res) => {
+    try {
+        res.status(200).json({ success: true, user: req.user })
+    } catch (error) {
+        return error(500, err.message, res)
+    }
+}
+
+export const logout = (req, res, next) => {
+    req.session.destroy((err) => {
+        if (err) return next(err);
+        res.clearCookie("connect.sid", {
+            secure: process.env.NODE_ENV === "development" ? false : true,
+            httpOnly: process.env.NODE_ENV === "development" ? false : true,
+            sameSite: process.env.NODE_ENV === "development" ? false : "none"
+        })
+        res.status(200).json({ success: true, message: "Logout Successfully" })
+    })
+}
+
+//Admin Panel
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find()
+        res.status(200).json({ success: true, users })
+    } catch (err) {
+        return error(500, err.message, res)
+    }
+}
+
+export const getStates = async (req, res) => {
+    try {
+        let totalIncome = 0
+        const usersCount = await User.countDocuments()
+        const orders = await Order.find()
+        const preparingOrders = orders.filter((i) => i.orderStatus === "Preparing")
+        const shipppedOrders = orders.filter((i) => i.orderStatus === "Shippped")
+        const deliveredOrders = orders.filter((i) => i.orderStatus === "Delivered")
+        orders.forEach((i) => totalIncome += i.totalPrice)
+        res.status(200).json({
+            success: true,
+            usersCount,
+            ordersCount: {
+                totalOrders: orders.length,
+                preparingOrders: preparingOrders.length,
+                shipppedOrders: shipppedOrders.length,
+                deliveredOrders: deliveredOrders.length
+            },
+            totalIncome
+        })
+    } catch (err) {
+        return error(500, err.message, res)
+    }
+}
