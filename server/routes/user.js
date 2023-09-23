@@ -18,6 +18,6 @@ router.route("/logout").get(logout)
 router.route("/admin/users").get(isAuthenticated, isAdmin, getAllUsers)
 router.route("/admin/states").get(isAuthenticated, isAdmin, getStates)
 router.route("/admin/contact/all").get(isAuthenticated, isAdmin, getContacts)
-router.route("/contact").post(contactForm)
+router.route("/contact").post(isAuthenticated, contactForm)
 
 export default router
