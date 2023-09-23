@@ -8,7 +8,7 @@ const router = express.Router()
 router.route("/googlelogin").get(passport.authenticate("google", {
     scope: ["profile"]
 }))
-router.get("login", passport.authenticate("google", {
+router.get("/login", passport.authenticate("google", {
     scope: ["profile"],
     successRedirect: process.env.FRONTEND_URL
 }))
